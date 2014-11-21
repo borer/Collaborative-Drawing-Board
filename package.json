@@ -1,0 +1,15 @@
+{
+  "name": "MultiUserBoard",
+  "author": "Bogdan Gochev <bogdan.dgochev@gmail.com>",
+  "license": "BSD-2-Clause",
+  "version": "0.0.1",
+  "description": "collaborative drawing board",
+  "dependencies": {
+    "express": "~4.10.2",
+    "socket.io": "~1.2.1"
+  },
+  "engine": "node 0.10.33",
+  "scripts": {
+    "run": "node app.js"
+  }
+}
