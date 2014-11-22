@@ -244,35 +244,6 @@ function SelectionManager() {
 	};
 }
 
-function getSelectedFigure(selectionManager) {
-	var newFigure;
-
-	if (selectionManager.isCircleSelected()) {
-		newFigure = Circle(canvasContext);
-		newFigure.draw(x, y);
-
-	} else if(selectionManager.isFilledCircleSelected()) {
-		newFigure = FilledCircle(canvasContext);
-		newFigure.draw(x, y);
-
-	} else if (selectionManager.isRectangleSelected()) {
-		newFigure = Rectangle(canvasContext);
-		newFigure.draw(x, y);
-
-	} else if(selectionManager.isRotatedRectangleSelected()) {
-		newFigure = RotatedRectangle(canvasContext);
-		newFigure.draw(x, y, 20);
-
-	} else if(selectionManager.isLineSelected()) {
-		var centerX = canvasContext.canvas.width/2;
-		var centerY = canvasContext.canvas.height/2;
-		newFigure = Line(canvasContext);
-		newFigure.draw(x, y,  centerX,  centerY);
-	} 
-
-	return newFigure;
-}
-
 function initBoard(canvasContext) {
     canvasContext.rect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
     canvasContext.fillStyle = "#5A798D";
@@ -336,7 +307,29 @@ $(function() {
 		var x = event.offsetX;
 		var y = event.offsetY;
 
-		var newFigure = getSelectedFigure(selectionManager);
+		var newFigure;
+		if (selectionManager.isCircleSelected()) {
+			newFigure = Circle(canvasContext);
+			newFigure.draw(x, y);
+
+		} else if(selectionManager.isFilledCircleSelected()) {
+			newFigure = FilledCircle(canvasContext);
+			newFigure.draw(x, y);
+
+		} else if (selectionManager.isRectangleSelected()) {
+			newFigure = Rectangle(canvasContext);
+			newFigure.draw(x, y);
+
+		} else if(selectionManager.isRotatedRectangleSelected()) {
+			newFigure = RotatedRectangle(canvasContext);
+			newFigure.draw(x, y, 20);
+
+		} else if(selectionManager.isLineSelected()) {
+			var centerX = canvasContext.canvas.width/2;
+			var centerY = canvasContext.canvas.height/2;
+			newFigure = Line(canvasContext);
+			newFigure.draw(x, y,  centerX,  centerY);
+		} 
 
 		communicationManager.broadcastEvent({name: eventNames.newDraw, data: newFigure.toJson()});
 	});
