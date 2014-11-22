@@ -9,8 +9,14 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/client/index.html');
 });
 
+var eventNames = {
+	newDraw: 'newDraw'
+};
+
 io.on('connection', function(socket){
-	console.log('a user connected');
+	socket.on(eventNames.newDraw, function(msg){
+		socket.broadcast.emit(eventNames.newDraw, msg);
+	});
 });
 
 http.listen(3000, function(){

@@ -1,5 +1,13 @@
 /////////////////////////////////////FIGURES
 
+var figureEnum = {
+	line: 1,
+	circle: 2,
+	rectangle: 3,
+	rotatedRrectangle: 4,
+	filledCircle: 5
+};
+
 var Line = function (canvasContext) {
 
 	var newLine = {
@@ -9,6 +17,14 @@ var Line = function (canvasContext) {
 		},
 		draw: function(fromX, fromY, toX, toY, myColor) {
 			var color = myColor || this.defaultColor;
+			this.json = {
+				'figureId': figureEnum.line,
+				'fromX': fromX,
+				'fromY': fromY,
+				'toX': toX,
+				'toY' : toY,
+				'myColor': myColor
+			};
 
 			this.ctx.save();
 			this.ctx.beginPath();
@@ -17,6 +33,12 @@ var Line = function (canvasContext) {
 			this.ctx.strokeStyle = color;
 			this.ctx.stroke();
 			this.ctx.restore();
+		},
+		toJson: function() {
+			return this.json;
+		},
+		drawFromJson: function(props) {
+			this.draw(props.fromX, props.fromY, props.toX, props.toY, props.myColor);
 		}
 	};
 
@@ -36,6 +58,13 @@ var Circle = function (canvasContext) {
 		draw: function(centerX, centerY, myRadius, myColor) {
 			var radius = myRadius || this.defaultRadius;
 			var color = myColor || this.defaultColor;
+			this.json = {
+				'figureId': figureEnum.circle,
+				'centerX': centerX,
+				'centerY': centerY,
+				'myRadius': myRadius,
+				'myColor': myColor
+			};
 
 			this.ctx.save();
 			this.ctx.beginPath();
@@ -43,6 +72,12 @@ var Circle = function (canvasContext) {
 			this.ctx.strokeStyle = color;
 			this.ctx.stroke();
 			this.ctx.restore();
+		},
+		toJson: function() {
+			return this.json;
+		},
+		drawFromJson: function(props) {
+			this.draw(props.centerX, props.centerY, props.myRadius, props.myColor);
 		}
 	};
 
@@ -60,11 +95,24 @@ var FilledCircle = function (canvasContext) {
 			this.defaultFillColor = '#E3AE0A';
 		},
 		draw: function(centerX, centerY, myColor) {
+			this.json = {
+				'figureId': figureEnum.filledCircle,
+				'centerX': centerX,
+				'centerY': centerY,
+				'myColor': myColor
+			};
+
 			this.ctx.save();
 			this.circle.draw(centerX, centerY);
 			this.ctx.fillStyle = myColor || this.defaultFillColor;
 			this.ctx.fill();			
 			this.ctx.restore();
+		},
+		toJson: function() {
+			return this.json;
+		},
+		drawFromJson: function(props) {
+			this.draw(props.centerX, props.centerY, props.myColor);
 		}
 	};
 
@@ -90,12 +138,27 @@ var Rectangle = function (canvasContext) {
 			var fromX = centerX - width/2;
 			var fromY = centerY - height/2;
 
+			this.json = {
+				'figureId': figureEnum.rectangle, 
+				'centerX': centerX,
+				'centerY': centerY,
+				'myWidth': myWidth,
+				'myHeight': myHeight,
+				'myColor': myColor
+			};
+
 			this.ctx.save();
 			this.ctx.beginPath();
 			this.ctx.rect(fromX, fromY, width, height);
 			this.ctx.strokeStyle = color;
 			this.ctx.stroke();
 			this.ctx.restore();
+		},
+		toJson: function() {
+			return this.json;
+		},
+		drawFromJson: function(props) {
+			this.draw(props.centerX, props.centerY, props.myWidth, props.myHeight, props.myColor);
 		}
 	};
 
@@ -113,12 +176,25 @@ var RotatedRectangle = function (canvasContext) {
 			this.rectangle = new Rectangle(this.ctx);
 		},
 		draw: function(centerX, centerY, angleRotation) {
+			this.json = {
+				'figureId': figureEnum.rotatedRrectangle, 
+				'centerX': centerX,
+				'centerY': centerY,
+				'angleRotation': angleRotation
+			};
+
 			this.ctx.save();
 			this.ctx.translate(centerX, centerY);
 			this.ctx.rotate(angleRotation * TO_RADIANS);
 			this.ctx.translate(-centerX, -centerY);
 			this.rectangle.draw(centerX, centerY);			
 			this.ctx.restore();
+		},
+		toJson: function() {
+			return this.json;
+		},
+		parseFromJson: function(props) {
+			this.draw(props.centerX, props.centerY, props.angleRotation);
 		}
 	};
 
@@ -127,21 +203,10 @@ var RotatedRectangle = function (canvasContext) {
 	return newRotatedRectangle;
 };
 
-/////////////////////////////////////SERVER_COMUNNICATION
-
-
-
 /////////////////////////////////////UTILS
 
-function manageFigureSelection() {
+function SelectionManager() {
 
-	var figureEnum = {
-		line: 1,
-		circle: 2,
-		rectangle: 3,
-		rotatedRrectangle: 4,
-		filledCircle: 5
-	};
 	var selectedFigure = figureEnum.line;
 
 	$('.line').click(function() {
@@ -179,13 +244,82 @@ function manageFigureSelection() {
 	};
 }
 
-function initBoard(canvasContext) {
-	var width = canvasContext.canvas.width;
-    var height = canvasContext.canvas.height;
+function getSelectedFigure(selectionManager) {
+	var newFigure;
 
-    canvasContext.rect(0, 0, width, height);
+	if (selectionManager.isCircleSelected()) {
+		newFigure = Circle(canvasContext);
+		newFigure.draw(x, y);
+
+	} else if(selectionManager.isFilledCircleSelected()) {
+		newFigure = FilledCircle(canvasContext);
+		newFigure.draw(x, y);
+
+	} else if (selectionManager.isRectangleSelected()) {
+		newFigure = Rectangle(canvasContext);
+		newFigure.draw(x, y);
+
+	} else if(selectionManager.isRotatedRectangleSelected()) {
+		newFigure = RotatedRectangle(canvasContext);
+		newFigure.draw(x, y, 20);
+
+	} else if(selectionManager.isLineSelected()) {
+		var centerX = canvasContext.canvas.width/2;
+		var centerY = canvasContext.canvas.height/2;
+		newFigure = Line(canvasContext);
+		newFigure.draw(x, y,  centerX,  centerY);
+	} 
+
+	return newFigure;
+}
+
+function initBoard(canvasContext) {
+    canvasContext.rect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
     canvasContext.fillStyle = "#5A798D";
     canvasContext.fill();
+}
+
+/////////////////////////////////////SERVER_COMUNNICATION
+
+var eventNames = {
+	newDraw: 'newDraw'
+};
+
+function CommunicationManager(canvasContext) {
+	var socket = io();
+
+	socket.on(eventNames.newDraw, function(msg){
+		drawFigureFromJson(msg, canvasContext);
+	});
+
+	function drawFigureFromJson(msg, canvasContext) {
+
+		var newFigure;
+
+		if (msg.figureId === figureEnum.circle) {
+			newFigure = Circle(canvasContext);
+
+		} else if (msg.figureId === figureEnum.filledCircle) {
+			newFigure = FilledCircle(canvasContext);
+
+		} else if (msg.figureId === figureEnum.rectangle) {
+			newFigure = Rectangle(canvasContext);
+
+		} else if (msg.figureId === figureEnum.rotatedRrectangle) {
+			newFigure = RotatedRectangle(canvasContext);
+
+		} else if(msg.figureId === figureEnum.line) {
+			newFigure = Line(canvasContext);
+		} 
+
+		newFigure.drawFromJson(msg);
+	}
+
+	return {
+		broadcastEvent: function(event) {
+			socket.emit(event.name, event.data);
+		}
+	};
 }
 
 /////////////////////////////////////MAIN
@@ -194,24 +328,16 @@ $(function() {
     var boardElement = $('#Board').get(0);
 	var canvasContext = boardElement.getContext("2d");
 	initBoard(canvasContext);
-	var selection = new manageFigureSelection();
+
+	var selectionManager = new SelectionManager();
+	var communicationManager = new CommunicationManager(canvasContext);
 
 	$('#Board').click(function (event) {
 		var x = event.offsetX;
 		var y = event.offsetY;
 
-		if (selection.isCircleSelected()) {
-			Circle(canvasContext).draw(x, y);
-		} else if(selection.isFilledCircleSelected()) {
-			FilledCircle(canvasContext).draw(x, y);
-		}	else if (selection.isRectangleSelected()) {
-			Rectangle(canvasContext).draw(x, y);
-		} else if(selection.isRotatedRectangleSelected()) {
-			RotatedRectangle(canvasContext).draw(x, y, 20);
-		} else if(selection.isLineSelected()) {
-			var centerX = canvasContext.canvas.width/2;
-			var centerY = canvasContext.canvas.height/2;
-			Line(canvasContext).draw(x, y,  centerX,  centerY);
-		} 
+		var newFigure = getSelectedFigure(selectionManager);
+
+		communicationManager.broadcastEvent({name: eventNames.newDraw, data: newFigure.toJson()});
 	});
 });
