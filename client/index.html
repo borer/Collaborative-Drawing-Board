@@ -5,6 +5,7 @@
 		<title>Collaborative Drawing Board</title>
 		<link rel="stylesheet" href="public/bower_components/bootstrap/dist/css/bootstrap.min.css" />
 		<script src="public/bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="public/scripts/board.js"></script>
 		<style>
@@ -21,15 +22,27 @@
 	<div class="container">
 		<div class="row content">
 			<div class="col-md-2 controls">
-				<div class="btn-group-vertical center-block marginTop20" role="group" aria-label="Figures">
-					<button type="button" class="btn btn-info line">Line</button>
-					<button type="button" class="btn btn-info circle">Circle</button>
-					<button type="button" class="btn btn-info square">Square</button>
+				<div class="btn-group-vertical center-block marginTop20" data-toggle="buttons">
+					<label class="btn btn-primary active line">
+						<input type="radio" name="options" autocomplete="off" checked> Line
+					</label>
+					<label class="btn btn-primary circle">
+						<input type="radio" name="options" autocomplete="off"> Circle
+					</label>
+					<label class="btn btn-primary rectangle">
+						<input type="radio" name="options" autocomplete="off"> Rectangle
+					</label>
+					<label class="btn btn-primary rotatedRrectangle">
+						<input type="radio" name="options" autocomplete="off"> Rotated Rectangle
+					</label>
+					<label class="btn btn-primary filledCircle">
+						<input type="radio" name="options" autocomplete="off"> Filled Circle
+					</label>
 				</div>
 			</div>
-			<div class="col-md-8 board wall">
+			<div class="col-md-8 board">
 				<h1>Collaborative Drawing Board</h1>
-				<canvas class="border1" id="Board" width="600" height="600"></canvas>
+				<canvas class="border1 canvasBg" id="Board" width="600" height="600"></canvas>
 			</div>
 		</div>
 	</div>
