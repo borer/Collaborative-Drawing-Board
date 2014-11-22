@@ -1,11 +1,37 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Collaborative Drawing Board</title>
-    <link rel="stylesheet" href="client/bower_components/bootstrap/dist/css/bootstrap.min.css" />
-    <script src="/socket.io/socket.io.js"></script>
-  </head>
-  <body>
-    <h1>Collaborative Drawing Board</h1>
-  </body>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Collaborative Drawing Board</title>
+		<link rel="stylesheet" href="public/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+		<script src="public/bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="public/scripts/board.js"></script>
+		<style>
+			.border1 {
+				border:1px solid #000000;
+			}
+
+			.marginTop20 {
+				margin-top: 20px;
+			}
+        </style>
+	</head>
+<body>
+	<div class="container">
+		<div class="row content">
+			<div class="col-md-2 controls">
+				<div class="btn-group-vertical center-block marginTop20" role="group" aria-label="Figures">
+					<button type="button" class="btn btn-info line">Line</button>
+					<button type="button" class="btn btn-info circle">Circle</button>
+					<button type="button" class="btn btn-info square">Square</button>
+				</div>
+			</div>
+			<div class="col-md-8 board wall">
+				<h1>Collaborative Drawing Board</h1>
+				<canvas class="border1" id="Board" width="600" height="600"></canvas>
+			</div>
+		</div>
+	</div>
+</body>
 </html>
